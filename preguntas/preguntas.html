@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preguntas – Mundos</title>
+  <!-- Tu CSS general -->
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 1.5rem;
+    }
+
+    .contenedor {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+      background: #f7f7f7;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    select, button {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0;
+    }
+
+    .ruleta-numero {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+
+    .info {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .links-pdf {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .links-pdf a {
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      border: 1px solid #333;
+      display: inline-block;
+    }
+
+    /* botón volver */
+    .btn-volver {
+      margin-top: 2rem;
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background: #444;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 1rem;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Seleccionar Mundo y Pregunta</h1>
+
+    <div>
+      <label for="select-mundo"><strong>Elegí el mundo:</strong></label><br>
+      <select id="select-mundo">
+        <option value="">-- Seleccioná un mundo --</option>
+        <option value="borges">Mundo de Borges</option>
+        <option value="heladera">Mundo Cuánto vale una heladera</option>
+        <option value="isla">Mundo La isla desierta</option>
+        <option value="martinFierro">Mundo Martín Fierro</option>
+      </select>
+    </div>
+
+    <div>
+      <button id="btn-girar">Girar ruleta (1 a 5)</button>
+    </div>
+
+    <div class="ruleta-numero" id="ruleta-numero">-</div>
+
+    <div class="info" id="info-paginas"></div>
+
+    <div class="links-pdf" id="links-pdf" style="display:none;">
+      <a id="link-pregunta" href="#" target="_blank">Ver pregunta</a>
+      <a id="link-correccion" href="#" target="_blank">Ver corrección</a>
+    </div>
+
+    <div class="info">
+      <p><em>La primera pregunta está en la página 3 y cada 4 páginas aparece una nueva pregunta.</em></p>
+    </div>
+
+    <!-- BOTÓN VOLVER -->
+    <a href="../index.html" class="btn-volver">Volver</a>
+
+  </div>
+
+  <script>
+    const BASE_PDF = "../pdf/preguntas.pdf";
+
+    const mundos = {
+      borges: { nombre: "Mundo de Borges", indiceBloque: 0 },
+      heladera: { nombre: "Mundo Cuánto vale una heladera", indiceBloque: 1 },
+      isla: { nombre: "Mundo La isla desierta", indiceBloque: 2 },
+      martinFierro: { nombre: "Mundo Martín Fierro", indiceBloque: 3 }
+    };
+
+    const PREGUNTAS_POR_MUNDO = 5;
+    const PAGINA_PRIMERA_PREGUNTA = 3;
+    const DIF_PAGINAS_ENTRE_PREGUNTAS = 4;
+    const OFFSET_CORRECCION = 2;
+
+    const selectMundo = document.getElementById("select-mundo");
+    const btnGirar = document.getElementById("btn-girar");
+    const ruletaNumero = document.getElementById("ruleta-numero");
+    const infoPaginas = document.getElementById("info-paginas");
+    const linksPdf = document.getElementById("links-pdf");
+    const linkPregunta = document.getElementById("link-pregunta");
+    const linkCorreccion = document.getElementById("link-correccion");
+
+    let mundoSeleccionado = null;
+    let preguntaActual = null;
+
+    selectMundo.addEventListener("change", () => {
+      mundoSeleccionado = selectMundo.value || null;
+      preguntaActual = null;
+      ruletaNumero.textContent = "-";
+      infoPaginas.textContent = "";
+      linksPdf.style.display = "none";
+    });
+
+    function getPagina(mundoKey, nroPregunta, tipo) {
+      const mundo = mundos[mundoKey];
+      if (!mundo) return null;
+
+      const globalIndex =
+        mundo.indiceBloque * PREGUNTAS_POR_MUNDO + (nroPregunta - 1);
+
+      const paginaPregunta =
+        PAGINA_PRIMERA_PREGUNTA + globalIndex * DIF_PAGINAS_ENTRE_PREGUNTAS;
+
+      return tipo === "correccion"
+        ? paginaPregunta + OFFSET_CORRECCION
+        : paginaPregunta;
+    }
+
+    btnGirar.addEventListener("click", () => {
+      if (!mundoSeleccionado) {
+        alert("Primero tenés que elegir un mundo.");
+        return;
+      }
+
+      const numero = Math.floor(Math.random() * 5) + 1;
+      preguntaActual = numero;
+      ruletaNumero.textContent = numero;
+
+      const paginaPregunta = getPagina(
+        mundoSeleccionado,
+        preguntaActual,
+        "pregunta"
+      );
+      const paginaCorreccion = getPagina(
+        mundoSeleccionado,
+        preguntaActual,
+        "correccion"
+      );
+
+      if (paginaPregunta === null || paginaCorreccion === null) {
+        infoPaginas.textContent = "Ocurrió un error calculando las páginas.";
+        linksPdf.style.display = "none";
+        return;
+      }
+
+      const nombreMundo = mundos[mundoSeleccionado].nombre;
+      infoPaginas.textContent =
+        nombreMundo +
+        " – Pregunta " +
+        preguntaActual +
+        " | Página pregunta: " +
+        paginaPregunta +
+        " | Página corrección: " +
+        paginaCorreccion;
+
+      linkPregunta.href = BASE_PDF + "#page=" + paginaPregunta;
+      linkCorreccion.href = BASE_PDF + "#page=" + paginaCorreccion;
+
+      linksPdf.style.display = "flex";
+    });
+  </script>
+</body>
+</html>
