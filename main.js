@@ -8,14 +8,14 @@ let menu = document.createElement('div');
     let p2= document.createElement('p');
     menu.append(p2);
     let a2= document.createElement('a');
-    a2.href = '../preguntas/preguntas.html';
+    a2.href = './preguntas/preguntas.html';
     a2.textContent = 'Preguntas';
     p2.append(a2);
 
     
     menu.append(p);
     let a = document.createElement('a');
-    a.href = '../manualUsuario.pdf';
+    a.href = './manualUsuario.pdf';
     a.textContent = 'Manual de Usuario';
     p.append(a);
 
