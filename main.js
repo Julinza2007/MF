@@ -15,9 +15,16 @@ let menu = document.createElement('div');
     
     menu.append(p);
     let a = document.createElement('a');
-    a.href = './manualUsuario.pdf';
+    a.href = './pdf/manualUsuario.pdf';
     a.textContent = 'Manual de Usuario';
     p.append(a);
+
+    let p3= document.createElement('p');
+    menu.append(p3);
+    let a3= document.createElement('a');
+    a3.href = './pdf/GuiaDeCasilleros.pdf';
+    a3.textContent = 'Guía de Casilleros';
+    p3.append(a3);
 
 
 function desplegar(event){
