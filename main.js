@@ -22,7 +22,7 @@ let menu = document.createElement('div');
     let p3= document.createElement('p');
     menu.append(p3);
     let a3= document.createElement('a');
-    a3.href = './pdf/GuiaDeCasilleros.pdf';
+    a3.href = 'https://docs.google.com/document/d/1kViEs4v5u3ZyhKN8Z_jMiD6hu9jjrs0bKyAZPLwrUmg/edit?usp=sharing';
     a3.textContent = 'Guía de Casilleros';
     p3.append(a3);
 
